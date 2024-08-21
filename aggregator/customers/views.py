@@ -1,13 +1,14 @@
 from django.http import HttpResponse
-from django.shortcuts import render
-from django.contrib.auth.models import User
 
-from customers.models import AdditionalUserFields
+
+from customers.models import AdditionalUserFields, UserSearch
+from job.parsers import DjinniParser
 
 
 def test_view(request):
-    additionals = AdditionalUserFields.objects.all()
-    print(additionals)
-    for add in additionals:
-        print(add.user.is_staff)
-    return HttpResponse(additionals)
+    parser = DjinniParser()
+    user_search = UserSearch.objects.first()
+    print(user_search)
+    url = parser.parse_detail_urls('')
+
+    return HttpResponse('11111')
