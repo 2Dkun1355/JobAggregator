@@ -25,3 +25,18 @@ class AdditionalUserFields(models.Model):
         return self.user.username if self.user else self.id
 
 
+class UserSearch(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        related_name='search',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+    programming_language = models.CharField(max_length=32, null=True, blank=True)
+    salary = models.IntegerField(null=True, blank=True)
+    location = models.TextField(null=True, blank=True)
+    is_remote = models.BooleanField(null=True, blank=True)
+    level_need = models.CharField(max_length=32, null=True, blank=True)
+    years_need = models.IntegerField(null=True, blank=True)
+    english_lvl = models.CharField(max_length=32, null=True, blank=True)
