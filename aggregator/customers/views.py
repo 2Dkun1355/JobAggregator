@@ -6,13 +6,11 @@ from django.utils.html import avoid_wrapping
 from requests_html import AsyncHTMLSession
 
 from customers.models import AdditionalUserFields, UserSearch
-from job.parsers import DjinniParser
-
-
+from job.parsers import DjinniParser, DouParser
 
 
 def test_view(request):
-    search = UserSearch.objects.first()
-    parser = DjinniParser()
-    parser.parse_detail_urls('22')
-    return HttpResponse('11111')
+    user_search = UserSearch.objects.first()
+    parser = DouParser()
+    parser.run(user_search)
+    return HttpResponse("<h1>Successfully</h1>")
