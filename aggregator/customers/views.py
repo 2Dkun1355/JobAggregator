@@ -1,13 +1,18 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.contrib.auth.models import User
+import asyncio
+from threading import Thread
 
-from customers.models import AdditionalUserFields
+from django.http import HttpResponse
+from django.utils.html import avoid_wrapping
+from requests_html import AsyncHTMLSession
+
+from customers.models import AdditionalUserFields, UserSearch
+from job.parsers import DjinniParser
+
+
 
 
 def test_view(request):
-    additionals = AdditionalUserFields.objects.all()
-    print(additionals)
-    for add in additionals:
-        print(add.user.is_staff)
-    return HttpResponse(additionals)
+    search = UserSearch.objects.first()
+    parser = DjinniParser()
+    parser.parse_detail_urls('22')
+    return HttpResponse('11111')
