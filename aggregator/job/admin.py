@@ -3,7 +3,7 @@ from .models import RawVacancy, Vacancy
 
 
 class RawVacancyAdmin(admin.ModelAdmin):
-    list_display = ['url', 'data']
+    list_display = ['url']
 
 
 class VacancyAdmin(admin.ModelAdmin):

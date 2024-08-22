@@ -2,8 +2,9 @@ from django.db import models
 
 
 class RawVacancy(models.Model):
-    url = models.URLField()
+    url = models.URLField(unique=True)
     data = models.TextField()
+    is_processed = models.BooleanField(default=False)
 
 
 class Vacancy(models.Model):
