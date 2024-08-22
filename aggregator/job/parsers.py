@@ -1,6 +1,7 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
+import xmltodict, json
 
 import pyppeteer
 from requests import session
@@ -14,6 +15,7 @@ from job.models import RawVacancy
 class DjinniParser:
     base_url = 'https://djinni.co'
     detail_urls = []
+    vacancy_count = None
 
     def prepare_vacancies_url(self, user_search: UserSearch):
         mapper = {
@@ -32,17 +34,24 @@ class DjinniParser:
         url = f'{self.base_url}{query_params}'
         return url
 
-    def parse_detail_urls(self, vacancies_url):
-        vacancies_url = 'https://djinni.co/jobs/?primary_keyword=Python&salary=1000&employment=remote&english_level=intermediate'
+    # @staticmethod
+    # def calculate_pages_count(vac_count):
+    #     pages_count = (int(vac_count) // 15) + 1
+    #     print(f'PAges count: {pages_count}')
+    #     return pages_count
+
+    @staticmethod
+    def parse_detail_urls(vacancies_url):
         with HTMLSession() as session:
             response = session.get(url=vacancies_url)
-
-        # last_page = response.html.xpath("//a[@class='page-link']")
-        links = response.html.xpath("//a[@class='job-item__title-link']/@href")
-        urls = [f'{self.base_url}{link}' for link in links]
+            xml = xmltodict.parse(response.content)
+            page_json = json.dumps(xml)
+            page_dict = json.loads(page_json)
+            urls = [vac.get('link') for vac in page_dict.get('rss', {}).get('channel', {}).get('item', [])]
         return urls
 
-    def save_vacancy(self, url):
+    @staticmethod
+    def save_vacancy(url):
         with HTMLSession() as session:
             response = session.get(url=url)
             sleep(5)
@@ -67,11 +76,10 @@ class DjinniParser:
         except Exception as e:
             print(e)
 
-    # @staticmethod
-    # async def save_vacancy(url):
+    # async def render_html(self, vacancies_url):
     #     new_loop = asyncio.new_event_loop()
     #     asyncio.set_event_loop(new_loop)
-    #     session = AsyncHTMLSession()
+    #     asession = AsyncHTMLSession()
     #     browser = await pyppeteer.launch({
     #         'ignoreHTTPSErrors': True,
     #         'headless': True,
@@ -79,7 +87,7 @@ class DjinniParser:
     #         'handleSIGTERM': False,
     #         'handleSIGHUP': False
     #     })
-    #     session._browser = browser
-    #     resp_page = await session.get(url)
-    #     await resp_page.html.arender(scrolldown=2, sleep=2)  # 1 scroll down approximately exactly 10 news
-    #     return resp_page
+    #     asession._browser = browser
+    #     response = await asession.get(vacancies_url)
+    #     await response.html.arender(scrolldown=2, sleep=2)
+    #     return response
