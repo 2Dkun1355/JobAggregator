@@ -2,14 +2,16 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 import xmltodict, json
+from lxml import html
 
 import pyppeteer
 from requests import session
-from requests_html import HTMLSession, AsyncHTMLSession
+from requests_html import HTMLSession, AsyncHTMLSession, HTML
 from soupsieve import select
 
 from customers.models import UserSearch
 from job.models import RawVacancy
+from job.utils import extract_salary
 
 
 class DjinniParser:
@@ -27,31 +29,24 @@ class DjinniParser:
             'exp_level': user_search.years_need,
             'english_level': user_search.english_lvl,
         }
-        query_params = '/jobs/?'
+        query_params = '/jobs/rss/?'
         for key, value in mapper.items():
             if value:
                 query_params += f'{key}={value}&'
         url = f'{self.base_url}{query_params}'
         return url
 
-    # @staticmethod
-    # def calculate_pages_count(vac_count):
-    #     pages_count = (int(vac_count) // 15) + 1
-    #     print(f'PAges count: {pages_count}')
-    #     return pages_count
-
     @staticmethod
     def parse_detail_urls(vacancies_url):
         with HTMLSession() as session:
             response = session.get(url=vacancies_url)
-            xml = xmltodict.parse(response.content)
-            page_json = json.dumps(xml)
-            page_dict = json.loads(page_json)
-            urls = [vac.get('link') for vac in page_dict.get('rss', {}).get('channel', {}).get('item', [])]
+            page_dict = xmltodict.parse(response.content)
+            vacancies = page_dict.get('rss', {}).get('channel', {}).get('item', [])
+            urls = [vac.get('link') for vac in vacancies]
         return urls
 
     @staticmethod
-    def save_vacancy(url):
+    def save_raw_vacancy(url):
         with HTMLSession() as session:
             response = session.get(url=url)
             sleep(5)
@@ -65,6 +60,23 @@ class DjinniParser:
         for url in self.detail_urls:
             yield url
 
+    @staticmethod
+    def save_vacancy(raw_vacancy: RawVacancy):
+        html_page = html.fromstring(raw_vacancy.data)
+        print(type(html_page))
+        source = raw_vacancy.url.split('/')[2]
+        url = raw_vacancy.url
+        raw_data = raw_vacancy
+        description = html_page.xpath("//div[@class='col-sm-8 row-mobile-order-2']")[0].text_content()
+        programming_language = html_page.xpath("//ul[@id='job_extra_info']/li[@class='mb-1'][1]/div[@class='row']/div[@class='col pl-2']")[0].text_content()
+        try:
+            salary_max = html_page.xpath("//div[@class='col']/h1/span[@class='public-salary-item']")[0].text_content()
+            salary_max = extract_salary(salary_max)
+        except:
+            salary_max = None
+
+
+
     def run(self, user_search: UserSearch):
         vacancies_url = self.prepare_vacancies_url(user_search)
         self.detail_urls = self.parse_detail_urls(vacancies_url)
@@ -72,7 +84,7 @@ class DjinniParser:
         try:
             urls_gen = self.urls_generator()
             with ThreadPoolExecutor(max_workers=2) as executor:
-                executor.map(self.save_vacancy, urls_gen)
+                executor.map(self.save_raw_vacancy, urls_gen)
         except Exception as e:
             print(e)
 
@@ -110,7 +122,6 @@ class DouParser:
             if value:
                 query_params += f'{key}={value}&'
         url = f'{self.base_url}{query_params}'
-        print(url)
         return url
 
     @staticmethod
@@ -130,7 +141,7 @@ class DouParser:
         urls = response.html.xpath("//div[@class='title']/a[@class='vt']/@href")
         return urls
 
-    def save_vacancy(self, url):
+    def save_raw_vacancy(self, url):
         with HTMLSession() as session:
             response = session.get(url=url)
             sleep(5)
@@ -151,6 +162,6 @@ class DouParser:
         try:
             urls_gen = self.urls_generator()
             with ThreadPoolExecutor(max_workers=2) as executor:
-                executor.map(self.save_vacancy, urls_gen)
+                executor.map(self.save_raw_vacancy, urls_gen)
         except Exception as e:
             print(e)
