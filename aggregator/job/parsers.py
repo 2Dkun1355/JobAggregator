@@ -61,19 +61,60 @@ class DjinniParser:
             yield url
 
     @staticmethod
-    def save_vacancy(raw_vacancy: RawVacancy):
+    def extract_salary(table_block):
+        salary_min = None
+        salary_max = None
+        for li in table_block:
+            if '$' in li.text_content():
+                salary_values = li.text_content().replace('$', '').split('-')
+                if len(salary_values) == 1:
+                    salary_min = salary_values[0].strip()
+                    salary_max = salary_values[0].strip()
+                elif len(salary_values) > 1:
+                    salary_min = salary_values[0].strip()
+                    salary_max = salary_values[-1].strip()
+        try:
+            return int(salary_min.strip()), int(salary_max.strip())
+        except:
+            return None, None
+
+    @staticmethod
+    def extract_location(table_block):
+        location = None
+        for li in table_block:
+            if 'Офіс:' in li.text_content():
+                location = li.text_content().replace('Офіс: ', '').replace('\n', ' ').strip()
+        try:
+            return location
+        except:
+            return None
+
+    @staticmethod
+    def extract_remote(table_block):
+        remote = False
+        for li in table_block:
+            print(li.text_content().lower())
+            if 'віддалено' in li.text_content().lower():
+                remote = True
+        try:
+            return remote
+        except:
+            return False
+
+    def save_vacancy(self, raw_vacancy: RawVacancy):
         html_page = html.fromstring(raw_vacancy.data)
-        print(type(html_page))
         source = raw_vacancy.url.split('/')[2]
         url = raw_vacancy.url
         raw_data = raw_vacancy
         description = html_page.xpath("//div[@class='col-sm-8 row-mobile-order-2']")[0].text_content()
         programming_language = html_page.xpath("//ul[@id='job_extra_info']/li[@class='mb-1'][1]/div[@class='row']/div[@class='col pl-2']")[0].text_content()
-        try:
-            salary_max = html_page.xpath("//div[@class='col']/h1/span[@class='public-salary-item']")[0].text_content()
-            salary_max = extract_salary(salary_max)
-        except:
-            salary_max = None
+        table_top_block = html_page.xpath("//strong")
+        table_bot_block = html_page.xpath("//div[@class='col pl-2']")
+        salary_min, salary_max = self.extract_salary(table_top_block)
+        location = self.extract_location(table_bot_block)
+        is_remote = self.extract_remote(table_top_block)
+        print(is_remote)
+
 
 
 
