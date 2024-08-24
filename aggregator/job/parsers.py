@@ -1,5 +1,7 @@
 import asyncio
+import locale
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from time import sleep
 import xmltodict, json
 from lxml import html
@@ -11,7 +13,7 @@ from soupsieve import select
 
 from customers.models import UserSearch
 from job.models import RawVacancy
-from job.utils import extract_salary
+from job.utils import extract_salary, search_for_skins
 
 
 class DjinniParser:
@@ -145,7 +147,6 @@ class DjinniParser:
     #     await response.html.arender(scrolldown=2, sleep=2)
     #     return response
 
-
 class DouParser:
     base_url = 'https://jobs.dou.ua'
     detail_urls = []
@@ -158,11 +159,12 @@ class DouParser:
             'search': user_search.level_need,
             'exp': self.conversion_years(user_search.years_need) if user_search.years_need else None,
         }
-        query_params = '/vacancies/?'
+        query_params = '/vacancies/feeds/?'
         for key, value in mapper.items():
             if value:
                 query_params += f'{key}={value}&'
         url = f'{self.base_url}{query_params}'
+        print(url)
         return url
 
     @staticmethod
@@ -176,13 +178,17 @@ class DouParser:
         elif years_need > 5:
             return '5plus'
 
-    def parse_detail_urls(self, vacancies_url):
+    @staticmethod
+    def parse_detail_urls(vacancies_url):
         with HTMLSession() as session:
             response = session.get(url=vacancies_url)
-        urls = response.html.xpath("//div[@class='title']/a[@class='vt']/@href")
+            page_dict = xmltodict.parse(response.content)
+            vacancies = page_dict.get('rss', {}).get('channel', {}).get('item', [])
+            urls = [vac.get('link') for vac in vacancies]
         return urls
 
-    def save_raw_vacancy(self, url):
+    @staticmethod
+    def save_raw_vacancy(url):
         with HTMLSession() as session:
             response = session.get(url=url)
             sleep(5)
@@ -196,6 +202,22 @@ class DouParser:
         for url in self.detail_urls:
             yield url
 
+    @staticmethod
+    def save_vacancy(raw_vacancy: RawVacancy):
+        html_page = html.fromstring(raw_vacancy.data)
+        source = raw_vacancy.url.split('/')[2]
+        url = raw_vacancy.url
+        raw_data = raw_vacancy
+        programming_language = html_page.xpath("//li[@class='breadcrumbs']/a[2]")[0].text_content()
+        description = html_page.xpath("//div[@class='l-vacancy']/div[@class='b-typo vacancy-section']")[0].text_content()
+        plase = html_page.xpath("//li[@class='breadcrumbs']/a[3]")[0].text_content()
+        location = plase if plase !='віддалено' else None
+        is_remote = True if plase == 'віддалено' else False
+        skills = search_for_skins(description)
+        created_data = html_page.xpath("//div[@class='date']")[0].text_content().strip()
+        locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
+        created_data = datetime.strptime(created_data, "%d %B %Y").date()
+
     def run(self, user_search: UserSearch):
         vacancies_url = self.prepare_vacancies_url(user_search)
         self.detail_urls = self.parse_detail_urls(vacancies_url)
@@ -206,3 +228,4 @@ class DouParser:
                 executor.map(self.save_raw_vacancy, urls_gen)
         except Exception as e:
             print(e)
+

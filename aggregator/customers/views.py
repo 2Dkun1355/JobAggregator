@@ -11,8 +11,8 @@ from job.parsers import DjinniParser, DouParser
 
 
 def test_view(request):
-    obj = RawVacancy.objects.get(id=8)
-    print(obj.id)
-    parser = DjinniParser()
+    obj = RawVacancy.objects.first()
+    parser = DouParser()
+    print(obj.url)
     parser.save_vacancy(obj)
     return HttpResponse("<h1>Successfully</h1>")
