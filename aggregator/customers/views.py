@@ -11,8 +11,22 @@ from job.parsers import DjinniParser, DouParser
 
 
 def test_view(request):
-    obj = RawVacancy.objects.first()
-    parser = DouParser()
-    print(obj.url)
-    parser.save_vacancy(obj)
+    # test_parser()
     return HttpResponse("<h1>Successfully</h1>")
+
+
+def test_parser():
+    search = UserSearch.objects.first()
+    djinni_parser = DjinniParser()
+    dou_parser = DouParser()
+
+    djinni_parser.run(search)
+    dou_parser.run(search)
+    raw_djinni_qs = RawVacancy.objects.filter(source='Djinni')
+    raw_dou_qs = RawVacancy.objects.filter(source='DOU')
+
+    for raw in raw_djinni_qs:
+        djinni_parser.save_vacancy(raw)
+
+    for raw in raw_dou_qs:
+        dou_parser.save_vacancy(raw)

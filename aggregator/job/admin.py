@@ -3,7 +3,8 @@ from .models import RawVacancy, Vacancy
 
 
 class RawVacancyAdmin(admin.ModelAdmin):
-    list_display = ['url']
+    list_display = ['url', 'source', 'is_processed']
+    list_filter = ['source', 'is_processed']
 
 
 class VacancyAdmin(admin.ModelAdmin):

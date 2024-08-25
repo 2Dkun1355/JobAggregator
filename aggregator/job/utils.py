@@ -1,15 +1,25 @@
-def search_for_skins(description):
+def search_for_skills(description):
     SKILLS = ['oop', 'python', 'git', 'postgresql', 'mysql', 'django', 'sqlalchemy', 'fastapi', 'asyncio']
     skills_in_description = []
     description = [word.lower() for word in set(description.split())]
     for word in SKILLS:
         if word in description:
             skills_in_description.append(word)
-    return skills_in_description
+    return ', '.join(skills_in_description)
 
-def extract_salary(raw_string):
-    salary = ''
-    for char in raw_string:
-        if char.is_digit():
-            salary += char
-    return salary
+
+    # async def render_html(self, vacancies_url):
+    #     new_loop = asyncio.new_event_loop()
+    #     asyncio.set_event_loop(new_loop)
+    #     asession = AsyncHTMLSession()
+    #     browser = await pyppeteer.launch({
+    #         'ignoreHTTPSErrors': True,
+    #         'headless': True,
+    #         'handleSIGINT': False,
+    #         'handleSIGTERM': False,
+    #         'handleSIGHUP': False
+    #     })
+    #     asession._browser = browser
+    #     response = await asession.get(vacancies_url)
+    #     await response.html.arender(scrolldown=2, sleep=2)
+    #     return response

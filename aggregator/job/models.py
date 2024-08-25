@@ -5,7 +5,10 @@ class RawVacancy(models.Model):
     url = models.URLField(unique=True)
     data = models.TextField()
     is_processed = models.BooleanField(default=False)
+    source = models.CharField(max_length=32, null=True, blank=True)
 
+    def __str__(self):
+        return f'{self.source} - {self.url}'
 
 class Vacancy(models.Model):
     source = models.CharField(max_length=32, null=True, blank=True)
@@ -30,3 +33,5 @@ class Vacancy(models.Model):
     parsing_data = models.DateField(auto_now_add=True)
     update_date = models.DateField(auto_now=True)
 
+    def __str__(self):
+        return f'{self.source} - {self.url}'
