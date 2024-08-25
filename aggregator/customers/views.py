@@ -4,7 +4,7 @@ from threading import Thread
 from django.http import HttpResponse
 from django.utils.html import avoid_wrapping
 from requests_html import AsyncHTMLSession
-
+import requests
 from customers.models import AdditionalUserFields, UserSearch
 from job.models import RawVacancy
 from job.parsers import DjinniParser, DouParser
@@ -12,7 +12,16 @@ from job.parsers import DjinniParser, DouParser
 
 def test_view(request):
     # test_parser()
+    test_api()
     return HttpResponse("<h1>Successfully</h1>")
+
+
+def test_api():
+    url = 'https://swapi.dev/api/people/1/'
+    response = requests.get(url)
+
+
+
 
 
 def test_parser():
