@@ -1,5 +1,12 @@
 def search_for_skills(description):
-    SKILLS = ['oop', 'python', 'git', 'postgresql', 'mysql', 'django', 'sqlalchemy', 'fastapi', 'asyncio']
+    SKILLS = ['oop', 'python', 'git', 'postgresql', 'mysql', 'django', 'sqlalchemy', 'fastapi', 'asyncio', 'docker',
+              'kubernetes', 'celery', 'redis', 'graphql', 'rest', 'linux', 'ci/cd', 'aws', 'pytest', 'pandas', 'numpy',
+              'tensorflow', 'pytorch', 'javascript', 'typescript', 'html', 'css', 'sass', 'less', 'react', 'vue',
+              'angular', 'node.js', 'express.js', 'flask', 'ruby', 'rails', 'java', 'spring', 'kotlin', 'swift',
+              'objective-c', 'c', 'c++', 'c#', '.net', 'go', 'rust', 'php', 'laravel', 'symfony', 'perl', 'elixir',
+              'phoenix', 'scala', 'haskell', 'clojure', 'r', 'matlab', 'bash', 'shell', 'powershell', 'typescript',
+              'graphql', 'julia', 'dart', 'flutter', 'rust', 'solidity', 'truffle', 'web3.js', 'api']
+
     skills_in_description = []
     description = [word.lower() for word in set(description.split())]
     for word in SKILLS:

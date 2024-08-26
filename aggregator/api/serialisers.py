@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from customers.models import AdditionalUserFields
+from customers.models import AdditionalUserFields, UserSearch
 from job.models import RawVacancy, Vacancy
 
 
@@ -44,3 +44,11 @@ class AdditionalUserFieldsCreateSerializer(serializers.ModelSerializer):
             'created': datetime.now()
         })
         return representation
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+    user = AdditionalUserFieldsCreateSerializer
+    class Meta:
+        model = UserSearch
+        fields = ['id','user', 'programming_language', 'salary', 'location',
+              'is_remote', 'level_need', 'years_need', 'english_lvl']
