@@ -22,8 +22,7 @@ class AdditionalUserFields(models.Model):
     )
 
     def __str__(self):
-        return self.user.username if self.user else self.id
-
+        return f'{self.id}'
 
 class UserSearch(models.Model):
     user = models.ForeignKey(

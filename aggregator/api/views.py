@@ -1,8 +1,12 @@
-from rest_framework import mixins
+from datetime import datetime
+
+from rest_framework import mixins, status
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
 
-from api.serialisers import RawVacancySerializer, VacancySerializer
+from api.serialisers import RawVacancySerializer, VacancySerializer, AdditionalUserFieldsCreateSerializer
+from customers.models import AdditionalUserFields
 from job.models import RawVacancy, Vacancy
 
 
@@ -20,3 +24,21 @@ class VacancyViewSet(mixins.ListModelMixin,
     queryset = Vacancy.objects.all()
     serializer_class = VacancySerializer
     permission_classes = [AllowAny]
+
+class AdditionalUserFieldsViewSet(mixins.CreateModelMixin,
+                                  GenericViewSet):
+    queryset = AdditionalUserFields.objects.all()
+    serializer_class = AdditionalUserFieldsCreateSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)  # момент створення об'єкту в базі данних
+        headers = self.get_success_headers(serializer.data)
+        data = serializer.data
+        data.update({
+            'from_create': 'test'
+        })
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
+
