@@ -6,7 +6,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
 
 from api.serialisers import RawVacancySerializer, VacancySerializer, AdditionalUserFieldsCreateSerializer, \
-    UserSearchSerializer
+    UserSearchCreateSerializer
 from customers.models import AdditionalUserFields, UserSearch
 from job.models import RawVacancy, Vacancy
 
@@ -44,7 +44,9 @@ class AdditionalUserFieldsViewSet(mixins.CreateModelMixin,
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
 class UserSearchViewSet(mixins.CreateModelMixin,
-                              GenericViewSet):
+                        mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin,
+                        GenericViewSet):
     queryset = UserSearch.objects.all()
-    serializer_class = UserSearchSerializer
+    serializer_class = UserSearchCreateSerializer
     permission_classes = [AllowAny]

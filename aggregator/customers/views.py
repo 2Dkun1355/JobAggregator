@@ -11,7 +11,7 @@ from job.parsers import DjinniParser, DouParser
 
 
 def test_view(request):
-    test_parser()
+    # test_parser()
     test_api()
     return HttpResponse("<h1>Successfully</h1>")
 

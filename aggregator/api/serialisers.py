@@ -46,9 +46,8 @@ class AdditionalUserFieldsCreateSerializer(serializers.ModelSerializer):
         return representation
 
 
-class UserSearchSerializer(serializers.ModelSerializer):
-    user = AdditionalUserFieldsCreateSerializer
+class UserSearchCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSearch
-        fields = ['id','user', 'programming_language', 'salary', 'location',
+        fields = ['id', 'programming_language', 'salary', 'location',
               'is_remote', 'level_need', 'years_need', 'english_lvl']
