@@ -3,7 +3,7 @@ from datetime import datetime
 from rest_framework import mixins, status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from api.serialisers import RawVacancySerializer, VacancySerializer, AdditionalUserFieldsCreateSerializer, \
     UserSearchCreateSerializer
@@ -16,7 +16,7 @@ class RawVacancyViewSet(mixins.ListModelMixin,
                         GenericViewSet):
     queryset = RawVacancy.objects.all()
     serializer_class = RawVacancySerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 
 class VacancyViewSet(mixins.ListModelMixin,
@@ -24,13 +24,13 @@ class VacancyViewSet(mixins.ListModelMixin,
                         GenericViewSet):
     queryset = Vacancy.objects.all()
     serializer_class = VacancySerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 class AdditionalUserFieldsViewSet(mixins.CreateModelMixin,
                                   GenericViewSet):
     queryset = AdditionalUserFields.objects.all()
     serializer_class = AdditionalUserFieldsCreateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -49,4 +49,4 @@ class UserSearchViewSet(mixins.CreateModelMixin,
                         GenericViewSet):
     queryset = UserSearch.objects.all()
     serializer_class = UserSearchCreateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
