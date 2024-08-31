@@ -26,6 +26,13 @@ class VacancySerializer(serializers.ModelSerializer):
                   'years_need', 'skills', 'created_data', 'parsing_data', 'update_date']
 
 
+class VacancyChangeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vacancy
+        fields = ['id', 'source', 'url', 'raw_data', 'programming_language', 'location', 'is_remote', 'level_need',
+                  'years_need', 'skills', 'created_data', 'parsing_data', 'update_date']
+
+
 class AdditionalUserFieldsCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalUserFields
