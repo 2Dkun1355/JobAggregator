@@ -5,14 +5,23 @@ from django.http import HttpResponse
 from django.utils.html import avoid_wrapping
 from requests_html import AsyncHTMLSession
 import requests
+
+from api.serialisers import VacancySerializer
 from customers.models import AdditionalUserFields, UserSearch
-from job.models import RawVacancy
+from job.models import RawVacancy, Vacancy
 from job.parsers import DjinniParser, DouParser
+from job.utils import generate_mock_data
 
 
 def test_view(request):
     # test_parser()
-    test_api()
+    # test_api()
+
+    # vacancy = Vacancy.objects.first()
+    # print(vacancy)
+
+    generate_mock_data()
+
     return HttpResponse("<h1>Successfully</h1>")
 
 
