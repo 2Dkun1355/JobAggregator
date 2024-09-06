@@ -1,10 +1,8 @@
-from datetime import datetime
-
-from rest_framework import mixins, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, status, filters
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
 from api.serialisers import RawVacancySerializer, VacancySerializer, AdditionalUserFieldsCreateSerializer, \
     UserSearchCreateSerializer, VacancyChangeSerializer
 from customers.models import AdditionalUserFields, UserSearch
@@ -16,7 +14,10 @@ class RawVacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.R
                         GenericViewSet):
     queryset = RawVacancy.objects.all()
     serializer_class = RawVacancySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    filterset_fields = ['source', 'is_processed']
+    search_fields = ['data']
+    ordering_fields = ['source', 'is_processed']
 
 
 class VacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
@@ -24,7 +25,11 @@ class VacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retr
                         GenericViewSet):
     queryset = Vacancy.objects.all()
     serializer_class = [VacancySerializer, VacancyChangeSerializer]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['source', 'programming_language', 'location', 'is_remote','level_need', 'english_lvl']
+    search_fields = ['skills', 'description']
+    ordering_fields = ['level_need', 'years_need', 'created_data', 'parsing_data']
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
@@ -38,7 +43,9 @@ class AdditionalUserFieldsViewSet(mixins.CreateModelMixin, mixins.ListModelMixin
                         GenericViewSet):
     queryset = AdditionalUserFields.objects.all()
     serializer_class = AdditionalUserFieldsCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    filterset_fields = ['telegram_id', 'telegram_chat_id']
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -57,4 +64,6 @@ class UserSearchViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.R
                         GenericViewSet):
     queryset = UserSearch.objects.all()
     serializer_class = UserSearchCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    filterset_fields = ['programming_language', 'salary', 'location', 'is_remote','level_need', 'years_need', 'english_lvl']
+    ordering_fields = ['salary', 'location']
