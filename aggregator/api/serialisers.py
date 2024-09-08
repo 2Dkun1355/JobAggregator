@@ -20,10 +20,27 @@ class RawVacancySerializer(serializers.ModelSerializer):
 
 class VacancySerializer(serializers.ModelSerializer):
     raw_data = RawVacancySerializer()
+    salary_diff = serializers.SerializerMethodField(method_name='get_salary_diff', read_only=True, required=False)
     class Meta:
         model = Vacancy
         fields = ['id', 'source', 'url', 'raw_data', 'programming_language', 'location', 'is_remote', 'level_need',
-                  'years_need', 'skills', 'created_data', 'parsing_data', 'update_date']
+                  'salary_min', 'salary_max', 'years_need', 'skills', 'created_data', 'parsing_data', 'update_date',
+                  'salary_diff']
+
+    @staticmethod
+    def get_salary_diff(vacancy):
+        if vacancy.salary_max and vacancy.salary_min:
+            return vacancy.salary_max - vacancy.salary_min
+        else:
+            return None
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation.update({
+            'salary_diff': instance.salary_max - instance.salary_min
+        })
+        return representation
 
 
 class VacancyChangeSerializer(serializers.ModelSerializer):
