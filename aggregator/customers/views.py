@@ -20,7 +20,7 @@ def test_view(request):
     # vacancy = Vacancy.objects.first()
     # print(vacancy)
 
-    generate_mock_data()
+    # generate_mock_data()
 
     return HttpResponse("<h1>Successfully</h1>")
 
