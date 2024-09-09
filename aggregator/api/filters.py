@@ -2,6 +2,7 @@ import django_filters
 from django.db.models import Q
 
 from job.models import Vacancy
+from customers.models import UserSearch
 
 # показати  метод серіалайзер
 
@@ -33,3 +34,21 @@ class VacancyFilterSet(django_filters.FilterSet):
             return queryset.filter(Q(years_need__lte=1) | Q(level_need='Junior') | Q(salary_max__lte=500))
         else:
             return queryset
+
+
+class UserSearchFilterSet(django_filters.FilterSet):
+    salary_start = django_filters.NumberFilter(field_name='salary', lookup_expr='gte')
+    salary_end = django_filters.NumberFilter(field_name='salary', lookup_expr='lte')
+    location = django_filters.CharFilter(field_name='location', lookup_expr='icontains')
+    programming_language_category = django_filters.CharFilter(method='get_programming_language_category')
+
+    class Meta:
+        model = UserSearch
+        fields = ['programming_language', 'programming_language_category', 'salary', 'salary_start', 'salary_end', 'location', 'is_remote','level_need', 'years_need', 'english_lvl']
+
+    def get_programming_language_category(self, queryset, field_name, value):
+        if value == 'Top':
+            return queryset.filter(Q(programming_language='Python') | Q(programming_language='Java'))
+        elif value == 'Base':
+            return queryset.filter(Q(programming_language='PHP') | Q(programming_language='Javascript'))
+        return queryset
