@@ -1,10 +1,26 @@
 import django_filters
 from django.db.models import Q
+from rest_framework import filters
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
 from job.models import Vacancy
 from customers.models import UserSearch
 
 # показати  метод серіалайзер
+
+class CustomLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 5
+
+
+class CustomPagePagination(PageNumberPagination):
+    page_size = 3
+
+
+class YourOrderingFilter(filters.OrderingFilter):
+    def get_schema_fields(self, view):
+        self.ordering_description = "Fields for sorting: " +  ', '.join(view.ordering_fields)
+        return super().get_schema_fields(view)
+
 
 class VacancyFilterSet(django_filters.FilterSet):
     years_need_min = django_filters.NumberFilter(field_name='years_need', lookup_expr='gte')
@@ -14,7 +30,7 @@ class VacancyFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Vacancy
-        fields = ['years_need_min', 'years_need_max', 'years_need', 'for_junior']
+        fields = ['years_need_min', 'years_need_max', 'years_need', 'for_junior', 'location']
 
     def filter_best_vacancy(self, queryset, field_name, value):
         if value:
