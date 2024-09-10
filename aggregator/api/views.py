@@ -3,8 +3,10 @@ from rest_framework import mixins, status, filters
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 
-from api.filters import VacancyFilterSet, UserSearchFilterSet
+from api.filters import VacancyFilterSet, UserSearchFilterSet, CustomLimitOffsetPagination, CustomPagePagination, \
+    YourOrderingFilter
 from api.serialisers import RawVacancySerializer, VacancySerializer, AdditionalUserFieldsCreateSerializer, \
     UserSearchCreateSerializer, VacancyChangeSerializer
 from customers.models import AdditionalUserFields, UserSearch
@@ -20,6 +22,7 @@ class RawVacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.R
     filterset_fields = ['source', 'is_processed']
     search_fields = ['data']
     ordering_fields = ['source', 'is_processed']
+    pagination_class = CustomLimitOffsetPagination
 
 
 class VacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
@@ -28,13 +31,14 @@ class VacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retr
     queryset = Vacancy.objects.all()
     serializer_class = [VacancySerializer, VacancyChangeSerializer]
     permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, YourOrderingFilter]
     filterset_class = VacancyFilterSet
     # filterset_fields = {
     #     'years_need': ['lte', 'gte']
     # }
     search_fields = ['skills', 'description']
     ordering_fields = ['level_need', 'years_need', 'created_data', 'parsing_data']
+    pagination_class = CustomPagePagination
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
