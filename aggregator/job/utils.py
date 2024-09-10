@@ -6,6 +6,7 @@ from random import random, choice, choices, randint, randrange
 
 from django.contrib.auth.models import User
 
+from customers.models import UserSearch
 from job.models import RawVacancy, Vacancy
 
 SKILLS = ['oop', 'python', 'git', 'postgresql', 'mysql', 'django', 'github', 'celery-beat', 'postman',
@@ -90,4 +91,25 @@ def generate_mock_data():
             print(e)
 
 
+def generate_user_search():
+    for i in range(100):
+        programming_language = choice(['Python', 'Java', 'Javascript', 'PHP', None])
+        salary = randrange(500, 5000, 500)
+        location = choice(['Lviv', 'Kyiv', 'Dnipro', 'Odesa', None])
+        is_remote = choice([True, False, None])
+        level_need = choice(['Junior', 'Middle', 'Senior', None])
+        years_need = choice([1, 2, 3, 4, 5, None])
+        english_lvl = choice(['Pre Intermediate', 'Intermediate', 'Upper Intermediate', None])
 
+        try:
+            user_search = UserSearch.objects.create(
+                programming_language=programming_language,
+                salary=salary,
+                location=location,
+                is_remote=is_remote,
+                level_need=level_need,
+                years_need=years_need,
+                english_lvl=english_lvl,
+            )
+        except Exception as e:
+            print(e)

@@ -3,6 +3,8 @@ from rest_framework import mixins, status, filters
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from api.filters import VacancyFilterSet, UserSearchFilterSet
 from api.serialisers import RawVacancySerializer, VacancySerializer, AdditionalUserFieldsCreateSerializer, \
     UserSearchCreateSerializer, VacancyChangeSerializer
 from customers.models import AdditionalUserFields, UserSearch
@@ -27,7 +29,10 @@ class VacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.Retr
     serializer_class = [VacancySerializer, VacancyChangeSerializer]
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['source', 'programming_language', 'location', 'is_remote','level_need', 'english_lvl']
+    filterset_class = VacancyFilterSet
+    # filterset_fields = {
+    #     'years_need': ['lte', 'gte']
+    # }
     search_fields = ['skills', 'description']
     ordering_fields = ['level_need', 'years_need', 'created_data', 'parsing_data']
 
@@ -65,5 +70,5 @@ class UserSearchViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.R
     queryset = UserSearch.objects.all()
     serializer_class = UserSearchCreateSerializer
     permission_classes = [AllowAny]
-    filterset_fields = ['programming_language', 'salary', 'location', 'is_remote','level_need', 'years_need', 'english_lvl']
+    filterset_class = UserSearchFilterSet
     ordering_fields = ['salary', 'location']

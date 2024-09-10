@@ -10,7 +10,7 @@ from api.serialisers import VacancySerializer
 from customers.models import AdditionalUserFields, UserSearch
 from job.models import RawVacancy, Vacancy
 from job.parsers import DjinniParser, DouParser
-from job.utils import generate_mock_data
+from job.utils import generate_mock_data, generate_user_search
 
 
 def test_view(request):
@@ -21,6 +21,7 @@ def test_view(request):
     # print(vacancy)
 
     # generate_mock_data()
+    # generate_user_search()
 
     return HttpResponse("<h1>Successfully</h1>")
 
