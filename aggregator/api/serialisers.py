@@ -9,7 +9,7 @@ from customers.models import AdditionalUserFields, UserSearch
 from job.models import RawVacancy, Vacancy
 
 
-UserModel = get_user_model()
+User = get_user_model()
 
 
 class RawVacancySerializer(serializers.ModelSerializer):
@@ -72,7 +72,7 @@ class VacancyChangeSerializer(serializers.ModelSerializer):
 class AdditionalUserFieldsCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdditionalUserFields
-        fields = ['id', 'telegram_id', 'telegram_chat_id']
+        fields = ['id', 'user', 'telegram_id']
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
@@ -92,5 +92,11 @@ class AdditionalUserFieldsCreateSerializer(serializers.ModelSerializer):
 class UserSearchCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSearch
-        fields = ['id', 'programming_language', 'salary', 'location',
+        fields = ['id', 'user', 'programming_language', 'salary', 'location',
               'is_remote', 'level_need', 'years_need', 'english_lvl']
+
+class UserDjangoSerializer(serializers.ModelSerializer):
+    additional = AdditionalUserFieldsCreateSerializer(required=False, read_only=True)
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'additional']

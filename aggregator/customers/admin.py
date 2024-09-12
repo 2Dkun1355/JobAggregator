@@ -3,7 +3,7 @@ from .models import AdditionalUserFields, UserSearch
 
 
 class AdditionalUserFieldsAdmin(admin.ModelAdmin):
-    list_display = ['user', 'telegram_id', 'telegram_chat_id']
+    list_display = ['user', 'telegram_id']
     list_filter = ['user']
 
 
