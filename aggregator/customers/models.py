@@ -15,11 +15,6 @@ class AdditionalUserFields(models.Model):
         null=True,
         blank=True,
     )
-    telegram_chat_id = models.CharField(
-        max_length=64,
-        null=True,
-        blank=True,
-    )
 
     def __str__(self):
         return f'{self.id}'

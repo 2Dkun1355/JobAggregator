@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, filters
 from rest_framework.response import Response
@@ -6,12 +7,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 
 from api.filters import VacancyFilterSet, UserSearchFilterSet, CustomLimitOffsetPagination, CustomPagePagination, \
-    YourOrderingFilter
+    YourOrderingFilter, UserFilterSet
 from api.serialisers import RawVacancySerializer, VacancySerializer, AdditionalUserFieldsCreateSerializer, \
-    UserSearchCreateSerializer, VacancyChangeSerializer
+    UserSearchCreateSerializer, VacancyChangeSerializer, UserDjangoSerializer
 from customers.models import AdditionalUserFields, UserSearch
 from job.models import RawVacancy, Vacancy
 
+
+User = get_user_model()
 
 class RawVacancyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
                         mixins.UpdateModelMixin, mixins.DestroyModelMixin,
@@ -53,7 +56,7 @@ class AdditionalUserFieldsViewSet(mixins.CreateModelMixin, mixins.ListModelMixin
     queryset = AdditionalUserFields.objects.all()
     serializer_class = AdditionalUserFieldsCreateSerializer
     permission_classes = [AllowAny]
-    filterset_fields = ['telegram_id', 'telegram_chat_id']
+    filterset_fields = ['telegram_id']
 
 
     def create(self, request, *args, **kwargs):
@@ -76,3 +79,11 @@ class UserSearchViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.R
     permission_classes = [AllowAny]
     filterset_class = UserSearchFilterSet
     ordering_fields = ['salary', 'location']
+
+
+class UserViewSet(mixins.ListModelMixin,
+                  GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserDjangoSerializer
+    permission_classes = [AllowAny]
+    filterset_class = UserFilterSet

@@ -1,4 +1,5 @@
 import django_filters
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework import filters
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
@@ -6,7 +7,7 @@ from rest_framework.pagination import PageNumberPagination, LimitOffsetPaginatio
 from job.models import Vacancy
 from customers.models import UserSearch
 
-# показати  метод серіалайзер
+User = get_user_model()
 
 class CustomLimitOffsetPagination(LimitOffsetPagination):
     default_limit = 5
@@ -68,3 +69,11 @@ class UserSearchFilterSet(django_filters.FilterSet):
         elif value == 'Base':
             return queryset.filter(Q(programming_language='PHP') | Q(programming_language='Javascript'))
         return queryset
+
+class UserFilterSet(django_filters.FilterSet):
+    telegram_id = django_filters.CharFilter(field_name='additional__telegram_id', lookup_expr='exact')
+
+    class Meta:
+        model = User
+        fields = ['telegram_id']
+
