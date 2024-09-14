@@ -11,6 +11,7 @@ class UserSearchAdmin(admin.ModelAdmin):
     list_display = ['user', 'programming_language', 'location', 'is_remote',]
     list_filter = ['user', 'programming_language','salary', 'location',
                    'is_remote', 'level_need', 'years_need', 'english_lvl']
+    raw_id_fields = ['vacancy']
 
 
 admin.site.register(AdditionalUserFields, AdditionalUserFieldsAdmin)

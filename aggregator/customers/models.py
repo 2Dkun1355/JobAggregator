@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from job.models import Vacancy
+
 
 class AdditionalUserFields(models.Model):
     user = models.OneToOneField(
@@ -34,3 +36,18 @@ class UserSearch(models.Model):
     level_need = models.CharField(max_length=32, null=True, blank=True)
     years_need = models.IntegerField(null=True, blank=True)
     english_lvl = models.CharField(max_length=32, null=True, blank=True)
+    vacancy = models.ManyToManyField(to='job.Vacancy', null=True, blank=True)
+
+    def vacancy_match(self):
+        fields = ['programming_language', 'location', 'level_need']
+        filters = {}
+        for field in fields:
+            value = getattr(self, field)
+            if value:
+                filters.update({
+                    field: value
+                })
+
+        vacancies = Vacancy.objects.filter(**filters)
+        self.vacancy.set(vacancies)
+        self.save()
