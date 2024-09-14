@@ -31,7 +31,8 @@ class VacancyFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Vacancy
-        fields = ['years_need_min', 'years_need_max', 'years_need', 'for_junior', 'location']
+        fields = ['years_need_min', 'years_need_max', 'years_need', 'for_junior', 'location', 'programming_language',
+                  'is_remote', 'level_need']
 
     def filter_best_vacancy(self, queryset, field_name, value):
         if value:
